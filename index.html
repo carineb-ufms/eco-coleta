@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="EcoColeta Universitária: encontre pontos de coleta e registre o descarte do seu lixo eletrônico.">
+  <title>EcoColeta Universitária</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Vue 3 (build global, com compilador de templates). Versão fixa para o projeto não quebrar. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
+
+  <div id="app" v-cloak>
+    <a class="pular-link" href="#" @click.prevent="focarConteudo">Pular para o conteúdo</a>
+
+    <header class="topo">
+      <div class="topo__interno">
+        <a class="marca" href="#inicio" @click.prevent="ir('inicio')">
+          <span class="marca__icone" aria-hidden="true"></span>
+          EcoColeta <span class="marca__sub">Universitária</span>
+        </a>
+
+        <button class="menu-botao" type="button" aria-controls="menu-principal"
+                :aria-expanded="menuAberto ? 'true' : 'false'" @click="menuAberto = !menuAberto">
+          {{ menuAberto ? 'Fechar menu' : 'Menu' }}
+        </button>
+
+        <nav id="menu-principal" class="menu" :class="{ 'menu--aberto': menuAberto }" aria-label="Principal">
+          <ul>
+            <li v-for="item in itensMenu" :key="item.id">
+              <a :href="'#' + item.id" :aria-current="view === item.id ? 'page' : null"
+                 @click.prevent="ir(item.id)">{{ item.texto }}</a>
+            </li>
+            <li v-if="usuario">
+              <button class="botao botao--discreto" type="button" @click="sair">Sair</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="conteudo" ref="conteudo" tabindex="-1">
+      <!-- Área de avisos: leitores de tela anunciam as mensagens automaticamente -->
+      <div class="avisos" role="status" aria-live="polite">
+        <p v-if="aviso.texto" class="aviso" :class="'aviso--' + aviso.tipo">{{ aviso.texto }}</p>
+      </div>
+
+      <!-- ================= INÍCIO ================= -->
+      <section v-if="view === 'inicio'" class="pagina" aria-labelledby="t-inicio">
+        <div class="hero">
+          <h1 id="t-inicio" tabindex="-1">Aquele celular velho na gaveta tem destino certo.</h1>
+          <p class="hero__texto">
+            Encontre o ponto de coleta mais perto, veja o que cada ponto aceita e registre o que você descartou.
+          </p>
+          <p class="hero__acoes">
+            <a class="botao" href="#pontos" @click.prevent="ir('pontos')">Ver pontos de coleta</a>
+            <a v-if="!usuario" class="botao botao--contorno" href="#entrar" @click.prevent="ir('entrar')">Criar conta</a>
+            <a v-else class="botao botao--contorno" href="#descartar" @click.prevent="ir('descartar')">Registrar descarte</a>
+          </p>
+        </div>
+
+        <section class="trilha" aria-labelledby="t-passos">
+          <h2 id="t-passos">Como funciona</h2>
+          <ol class="trilha__lista">
+            <li>
+              <h3>Consulte o guia</h3>
+              <p>Veja o que pode ser descartado e os cuidados com pilhas e baterias.</p>
+            </li>
+            <li>
+              <h3>Escolha um ponto</h3>
+              <p>Filtre por cidade e pelo tipo de item que você vai levar.</p>
+            </li>
+            <li>
+              <h3>Registre o descarte</h3>
+              <p>Depois de entregar, anote o item e acompanhe seu histórico.</p>
+            </li>
+          </ol>
+        </section>
+
+        <p class="resumo-numeros">
+          Hoje são <strong>{{ pontos.length }}</strong> pontos cadastrados e
+          <strong>{{ totalItensGeral }}</strong> itens registrados no navegador.
+        </p>
+      </section>
+
+      <!-- ================= PONTOS DE COLETA ================= -->
+      <section v-else-if="view === 'pontos'" class="pagina" aria-labelledby="t-pontos">
+        <h1 id="t-pontos" tabindex="-1">Pontos de coleta</h1>
+
+        <form class="filtros" @submit.prevent aria-label="Filtrar pontos de coleta">
+          <div class="campo">
+            <label for="f-cidade">Cidade</label>
+            <select id="f-cidade" v-model="filtroCidade">
+              <option value="">Todas as cidades</option>
+              <option v-for="c in cidades" :key="c" :value="c">{{ c }}</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="f-tipo">Tipo de item</label>
+            <select id="f-tipo" v-model="filtroTipo">
+              <option value="">Todos os itens</option>
+              <option v-for="t in tiposItem" :key="t" :value="t">{{ t }}</option>
+            </select>
+          </div>
+        </form>
+
+        <p class="contagem">{{ pontosFiltrados.length }} {{ pontosFiltrados.length === 1 ? 'ponto encontrado' : 'pontos encontrados' }}</p>
+
+        <ul class="grade" v-if="pontosFiltrados.length">
+          <li v-for="p in pontosFiltrados" :key="p.id">
+            <ponto-card :ponto="p"></ponto-card>
+          </li>
+        </ul>
+        <p v-else class="vazio">
+          Nenhum ponto encontrado com esses filtros. Tente outra cidade ou escolha “Todos os itens”.
+        </p>
+      </section>
+
+      <!-- ================= GUIA ================= -->
+      <section v-else-if="view === 'guia'" class="pagina" aria-labelledby="t-guia">
+        <h1 id="t-guia" tabindex="-1">Guia de descarte</h1>
+        <div class="duas-colunas">
+          <section aria-labelledby="t-aceitos" class="bloco">
+            <h2 id="t-aceitos">O que pode ser descartado</h2>
+            <ul class="lista-simples">
+              <li v-for="t in tiposItem" :key="t">{{ t }}</li>
+            </ul>
+            <p class="nota">Cada ponto de coleta define o que aceita. Confira na página de pontos antes de sair de casa.</p>
+          </section>
+          <section aria-labelledby="t-cuidados" class="bloco">
+            <h2 id="t-cuidados">Cuidados antes de entregar</h2>
+            <ul class="lista-simples">
+              <li>Faça backup e restaure celulares e computadores para o padrão de fábrica.</li>
+              <li>Não abra, fure ou amasse pilhas e baterias.</li>
+              <li>Baterias estufadas ou vazando: guarde separadas, em local seco e arejado, e avise o ponto de coleta.</li>
+              <li>Não jogue eletrônicos no lixo comum.</li>
+            </ul>
+          </section>
+        </div>
+      </section>
+
+      <!-- ================= ENTRAR / CADASTRAR ================= -->
+      <section v-else-if="view === 'entrar'" class="pagina pagina--estreita" aria-labelledby="t-entrar">
+        <h1 id="t-entrar" tabindex="-1">{{ modoCadastro ? 'Criar conta' : 'Entrar' }}</h1>
+
+        <form class="formulario" @submit.prevent="enviarAuth" novalidate>
+          <div class="campo" v-if="modoCadastro">
+            <label for="a-nome">Nome completo</label>
+            <input id="a-nome" type="text" v-model="formAuth.nome" autocomplete="name" required>
+          </div>
+          <div class="campo">
+            <label for="a-email">E-mail</label>
+            <input id="a-email" type="email" v-model="formAuth.email" autocomplete="email" required>
+          </div>
+          <div class="campo">
+            <label for="a-senha">Senha</label>
+            <input id="a-senha" type="password" v-model="formAuth.senha" aria-describedby="a-senha-ajuda"
+                   :autocomplete="modoCadastro ? 'new-password' : 'current-password'" required minlength="6">
+            <small id="a-senha-ajuda">Mínimo de 6 caracteres.</small>
+          </div>
+          <button class="botao" type="submit">{{ modoCadastro ? 'Criar conta' : 'Entrar' }}</button>
+        </form>
+
+        <p class="troca-modo">
+          {{ modoCadastro ? 'Já tem conta?' : 'Ainda não tem conta?' }}
+          <button class="link-botao" type="button" @click="alternarModo">
+            {{ modoCadastro ? 'Entrar' : 'Criar conta' }}
+          </button>
+        </p>
+      </section>
+
+      <!-- ================= REGISTRAR DESCARTE ================= -->
+      <section v-else-if="view === 'descartar'" class="pagina pagina--estreita" aria-labelledby="t-descartar">
+        <h1 id="t-descartar" tabindex="-1">Registrar descarte</h1>
+        <p>Registre aqui o que você entregou em um ponto de coleta.</p>
+
+        <form class="formulario" @submit.prevent="registrarDescarte" novalidate>
+          <div class="campo">
+            <label for="d-tipo">Tipo de item</label>
+            <select id="d-tipo" v-model="formDescarte.tipo" required>
+              <option value="" disabled>Escolha o tipo</option>
+              <option v-for="t in tiposItem" :key="t" :value="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="d-qtd">Quantidade</label>
+            <input id="d-qtd" type="number" min="1" max="99" inputmode="numeric" v-model.number="formDescarte.quantidade" required>
+          </div>
+          <div class="campo">
+            <label for="d-ponto">Ponto de coleta</label>
+            <select id="d-ponto" v-model="formDescarte.pontoId" required aria-describedby="d-ponto-ajuda">
+              <option value="" disabled>Escolha o ponto</option>
+              <option v-for="p in pontosParaTipo" :key="p.id" :value="p.id">{{ p.nome }} — {{ p.cidade }}</option>
+            </select>
+            <small id="d-ponto-ajuda">Aparecem só os pontos que aceitam o tipo escolhido.</small>
+          </div>
+          <div class="campo">
+            <label for="d-obs">Observação (opcional)</label>
+            <textarea id="d-obs" rows="3" maxlength="200" v-model="formDescarte.obs"></textarea>
+          </div>
+          <button class="botao" type="submit">Registrar descarte</button>
+        </form>
+
+        <aside v-if="ultimoDescarte" class="comprovante" aria-label="Último descarte registrado">
+          <h2>Descarte registrado</h2>
+          <p>Registro <strong>{{ codigo(ultimoDescarte) }}</strong>: {{ ultimoDescarte.quantidade }} × {{ ultimoDescarte.tipo }}
+             em {{ ultimoDescarte.pontoNome }}.</p>
+        </aside>
+      </section>
+
+      <!-- ================= HISTÓRICO ================= -->
+      <section v-else-if="view === 'historico'" class="pagina" aria-labelledby="t-hist">
+        <h1 id="t-hist" tabindex="-1">Meu histórico</h1>
+        <p v-if="meusDescartes.length" class="contagem">
+          {{ meusDescartes.length }} {{ meusDescartes.length === 1 ? 'registro' : 'registros' }},
+          {{ totalMeusItens }} {{ totalMeusItens === 1 ? 'item descartado' : 'itens descartados' }}.
+        </p>
+
+        <div class="tabela-rolagem" v-if="meusDescartes.length" tabindex="0" role="region" aria-label="Tabela do histórico de descartes">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Item</th>
+                <th scope="col">Qtd.</th>
+                <th scope="col">Ponto de coleta</th>
+                <th scope="col">Registro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="d in meusDescartes" :key="d.id">
+                <td>{{ formatarData(d.data) }}</td>
+                <td>{{ d.tipo }}</td>
+                <td>{{ d.quantidade }}</td>
+                <td>{{ d.pontoNome }}</td>
+                <td>{{ codigo(d) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p v-else class="vazio">
+          Você ainda não registrou nenhum descarte.
+          <a href="#descartar" @click.prevent="ir('descartar')">Registrar o primeiro descarte</a>
+        </p>
+      </section>
+
+      <!-- ================= ADMINISTRAÇÃO ================= -->
+      <section v-else-if="view === 'admin'" class="pagina" aria-labelledby="t-admin">
+        <h1 id="t-admin" tabindex="-1">Administração</h1>
+
+        <section class="bloco" aria-labelledby="t-rel">
+          <h2 id="t-rel">Relatório básico</h2>
+          <dl class="numeros">
+            <div><dt>Estudantes cadastrados</dt><dd>{{ usuarios.length }}</dd></div>
+            <div><dt>Descartes registrados</dt><dd>{{ descartes.length }}</dd></div>
+            <div><dt>Itens descartados</dt><dd>{{ totalItensGeral }}</dd></div>
+            <div><dt>Pontos de coleta</dt><dd>{{ pontos.length }}</dd></div>
+          </dl>
+
+          <h3>Itens por tipo</h3>
+          <ul class="barras">
+            <li v-for="linha in relatorioPorTipo" :key="linha.tipo">
+              <barra-relatorio :rotulo="linha.tipo" :valor="linha.total" :maximo="maiorTotal"></barra-relatorio>
+            </li>
+          </ul>
+        </section>
+
+        <section class="bloco" aria-labelledby="t-form-ponto">
+          <h2 id="t-form-ponto">{{ formPonto.id ? 'Editar ponto de coleta' : 'Novo ponto de coleta' }}</h2>
+          <form class="formulario" @submit.prevent="salvarPonto" novalidate>
+            <div class="campo">
+              <label for="p-nome">Nome do ponto</label>
+              <input id="p-nome" ref="campoNomePonto" type="text" v-model="formPonto.nome" required>
+            </div>
+            <div class="campo">
+              <label for="p-cidade">Cidade</label>
+              <input id="p-cidade" type="text" v-model="formPonto.cidade" required>
+            </div>
+            <div class="campo">
+              <label for="p-end">Endereço</label>
+              <input id="p-end" type="text" v-model="formPonto.endereco" required>
+            </div>
+            <div class="campo">
+              <label for="p-hor">Horário de funcionamento</label>
+              <input id="p-hor" type="text" v-model="formPonto.horario" placeholder="Ex.: seg a sex, 8h às 17h" required>
+            </div>
+            <fieldset class="campo">
+              <legend>Itens aceitos</legend>
+              <div class="marcadores">
+                <label v-for="(t, i) in tiposItem" :key="t" class="marcador">
+                  <input type="checkbox" :value="t" v-model="formPonto.tipos">
+                  <span>{{ t }}</span>
+                </label>
+              </div>
+            </fieldset>
+            <div class="acoes">
+              <button class="botao" type="submit">{{ formPonto.id ? 'Salvar alterações' : 'Adicionar ponto' }}</button>
+              <button v-if="formPonto.id" class="botao botao--contorno" type="button" @click="cancelarEdicao">Cancelar edição</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="bloco" aria-labelledby="t-lista-pontos">
+          <h2 id="t-lista-pontos">Pontos cadastrados</h2>
+          <ul class="grade" v-if="pontos.length">
+            <li v-for="p in pontos" :key="p.id">
+              <ponto-card :ponto="p">
+                <button class="botao botao--pequeno" type="button" @click="editarPonto(p)">Editar</button>
+                <button class="botao botao--pequeno botao--perigo" type="button" @click="excluirPonto(p)">Excluir</button>
+              </ponto-card>
+            </li>
+          </ul>
+          <p v-else class="vazio">Nenhum ponto cadastrado. Use o formulário acima para adicionar o primeiro.</p>
+        </section>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <p>Projeto Integrador de Tecnologia da Informação II — UFMS Digital. Os dados ficam salvos só neste navegador.</p>
+    </footer>
+  </div>
+
+  <script src="js/dados.js"></script>
+  <script src="js/armazenamento.js"></script>
+  <script src="js/componentes.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+/* ==========================================================
+   EcoColeta Universitária — estilos
+   Mobile first: o CSS base serve para celular e as media
+   queries (min-width) ampliam o layout para telas maiores.
+   ========================================================== */
+
+:root {
+  --placa: #0d3b30;          /* verde de placa de circuito (fundo do topo e do hero) */
+  --placa-media: #0d6b4f;    /* botões e links */
+  --placa-clara: #e1efe8;    /* fundos suaves */
+  --sinal: #f0c230;          /* amarelo de solda: foco e detalhes do circuito */
+  --papel: #f3f6f4;          /* fundo da página */
+  --branco: #ffffff;
+  --tinta: #15231e;          /* texto */
+  --tinta-suave: #4a5a54;
+  --linha: #c9d6d0;
+  --erro: #9b1c1c;
+  --erro-fundo: #fdeaea;
+  --ok-fundo: #e3f4e9;
+  --info-fundo: #e8f0fb;
+  --raio: 0.5rem;
+  --fonte: "Avenir Next", "Segoe UI", Roboto, "Helvetica Neue", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+[v-cloak] { display: none; }
+
+html { font-size: 100%; scroll-padding-top: 5rem; }
+
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  line-height: 1.6;
+  color: var(--tinta);
+  background: var(--papel);
+  min-height: 100vh;
+}
+
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+
+img, svg { max-width: 100%; height: auto; }
+
+h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 0.75rem; }
+h1 { font-size: 1.9rem; font-weight: 800; }
+h2 { font-size: 1.35rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0 0 1rem; max-width: 70ch; }
+a { color: var(--placa-media); text-underline-offset: 0.15em; }
+
+/* Foco sempre visível para quem navega pelo teclado */
+:focus-visible {
+  outline: 3px solid var(--sinal);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--placa);
+}
+h1:focus, main:focus { outline: none; box-shadow: none; }
+
+.pular-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  background: var(--sinal);
+  color: var(--tinta);
+  padding: 0.6rem 1rem;
+  border-radius: var(--raio);
+  z-index: 20;
+  font-weight: 700;
+}
+.pular-link:focus { top: 0.5rem; }
+
+/* ---------- Topo e menu ---------- */
+.topo { background: var(--placa); color: var(--branco); position: sticky; top: 0; z-index: 10; }
+.topo__interno {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--branco);
+  font-weight: 800;
+  font-size: 1.15rem;
+  text-decoration: none;
+  min-height: 2.75rem;
+}
+.marca__sub { font-weight: 400; opacity: 0.85; }
+/* Ícone feito só com CSS: um chip com trilhas */
+.marca__icone {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 3px solid var(--sinal);
+  border-radius: 0.3rem;
+  background:
+    linear-gradient(var(--sinal), var(--sinal)) center / 100% 3px no-repeat,
+    linear-gradient(var(--sinal), var(--sinal)) center / 3px 100% no-repeat;
+}
+
+.menu-botao {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-weight: 700;
+  color: var(--branco);
+  background: transparent;
+  border: 2px solid var(--branco);
+  border-radius: var(--raio);
+  cursor: pointer;
+}
+
+.menu { display: none; width: 100%; }
+.menu--aberto { display: block; }
+.menu ul { list-style: none; margin: 0; padding: 0.5rem 0 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.menu a, .menu .botao--discreto {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  color: var(--branco);
+  text-decoration: none;
+  border-radius: var(--raio);
+  font: inherit;
+  font-weight: 600;
+}
+.menu a:hover { background: rgba(255, 255, 255, 0.12); }
+.menu a[aria-current="page"] { background: var(--branco); color: var(--placa); }
+
+/* ---------- Estrutura geral ---------- */
+main { flex: 1; width: 100%; max-width: 72rem; margin: 0 auto; padding: 1rem 1rem 3rem; }
+.pagina { display: block; }
+.pagina--estreita { max-width: 34rem; }
+
+.avisos { min-height: 0; }
+.aviso { padding: 0.75rem 1rem; border-radius: var(--raio); border-left: 6px solid; margin: 0 0 1rem; max-width: none; font-weight: 600; }
+.aviso--erro { background: var(--erro-fundo); border-color: var(--erro); color: var(--erro); }
+.aviso--sucesso { background: var(--ok-fundo); border-color: var(--placa-media); color: #0a4a36; }
+.aviso--info { background: var(--info-fundo); border-color: #2b5fa8; color: #1b3f73; }
+
+.rodape { background: var(--placa); color: #d6e6de; padding: 1.25rem 1rem; font-size: 0.9rem; }
+.rodape p { max-width: 72rem; margin: 0 auto; }
+
+/* ---------- Botões ---------- */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  font: inherit;
+  font-weight: 700;
+  color: var(--branco);
+  background: var(--placa-media);
+  border: 2px solid var(--placa-media);
+  border-radius: var(--raio);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.botao:hover { background: var(--placa); border-color: var(--placa); }
+.botao--contorno { background: transparent; color: var(--placa-media); }
+.botao--contorno:hover { background: var(--placa-clara); color: var(--placa); border-color: var(--placa-media); }
+.botao--pequeno { min-height: 2.5rem; padding: 0.25rem 0.9rem; font-size: 0.95rem; }
+.botao--perigo { background: var(--branco); color: var(--erro); border-color: var(--erro); }
+.botao--perigo:hover { background: var(--erro-fundo); color: var(--erro); border-color: var(--erro); }
+.botao--discreto { background: transparent; border-color: transparent; justify-content: flex-start; cursor: pointer; }
+
+.link-botao { font: inherit; color: var(--placa-media); background: none; border: 0; padding: 0.5rem 0.25rem; text-decoration: underline; cursor: pointer; font-weight: 700; }
+
+/* ---------- Início: hero e trilha de circuito ---------- */
+.hero {
+  margin: 0 -1rem 2rem;
+  padding: 2.5rem 1rem 2.25rem;
+  color: var(--branco);
+  background-color: var(--placa);
+  /* trilhas de placa de circuito, bem discretas */
+  background-image:
+    linear-gradient(90deg, rgba(240, 194, 48, 0.14) 2px, transparent 2px),
+    linear-gradient(0deg, rgba(240, 194, 48, 0.1) 2px, transparent 2px);
+  background-size: 3rem 3rem, 3rem 3rem;
+}
+.hero h1 { font-size: 2.1rem; max-width: 18ch; }
+.hero__texto { font-size: 1.1rem; max-width: 40ch; color: #e6f1ec; }
+.hero__acoes { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 0; }
+.hero .botao { background: var(--sinal); border-color: var(--sinal); color: var(--tinta); }
+.hero .botao:hover { background: var(--branco); border-color: var(--branco); }
+.hero .botao--contorno { background: transparent; color: var(--branco); border-color: var(--branco); }
+.hero .botao--contorno:hover { background: var(--branco); color: var(--placa); }
+
+.trilha { margin-bottom: 2rem; }
+.trilha__lista { list-style: none; margin: 1rem 0 0; padding: 0 0 0 2rem; position: relative; counter-reset: passo; }
+/* linha vertical (celular) ligando os passos */
+.trilha__lista::before { content: ""; position: absolute; left: 0.7rem; top: 0.5rem; bottom: 0.5rem; width: 3px; background: var(--placa-media); }
+.trilha__lista li { position: relative; padding-bottom: 1.5rem; counter-increment: passo; }
+.trilha__lista li::before {
+  content: counter(passo);
+  position: absolute;
+  left: -2.05rem;
+  top: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--tinta);
+  background: var(--sinal);
+  border: 3px solid var(--placa);
+  border-radius: 50%;
+}
+.trilha__lista h3 { margin-bottom: 0.25rem; }
+.trilha__lista p { margin: 0; }
+.resumo-numeros { color: var(--tinta-suave); }
+
+/* ---------- Formulários ---------- */
+.formulario { display: grid; gap: 1rem; margin: 1.25rem 0; }
+.campo { display: grid; gap: 0.35rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+label, legend { font-weight: 700; padding: 0; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], select, textarea {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--tinta);
+  background: var(--branco);
+  border: 2px solid #7f918a;
+  border-radius: var(--raio);
+}
+textarea { resize: vertical; }
+small { color: var(--tinta-suave); }
+.acoes { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.troca-modo { color: var(--tinta-suave); }
+
+.marcadores { display: grid; gap: 0.25rem; margin-top: 0.35rem; }
+.marcador { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; font-weight: 400; cursor: pointer; }
+.marcador input { width: 1.4rem; height: 1.4rem; accent-color: var(--placa-media); flex: none; }
+
+.filtros { display: grid; gap: 1rem; margin: 1rem 0; padding: 1rem; background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio); }
+.contagem { color: var(--tinta-suave); font-weight: 600; }
+.vazio { padding: 1rem; background: var(--branco); border: 2px dashed var(--linha); border-radius: var(--raio); }
+
+/* ---------- Cartões de ponto de coleta ---------- */
+.grade { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: 1fr; }
+.cartao { height: 100%; background: var(--branco); border: 1px solid var(--linha); border-top: 5px solid var(--placa-media); border-radius: var(--raio); padding: 1rem; display: flex; flex-direction: column; }
+.cartao__titulo { margin-bottom: 0.15rem; }
+.cartao__cidade { color: var(--tinta-suave); font-weight: 600; margin-bottom: 0.5rem; }
+.cartao__selo { display: inline-block; align-self: flex-start; margin: 0 0 0.35rem; padding: 0.1rem 0.5rem; font-size: 0.85rem; font-weight: 700; background: var(--sinal); color: var(--tinta); border-radius: 0.25rem; }
+.cartao__dados { margin: 0 0 0.75rem; }
+.cartao__dados dt { font-weight: 700; font-size: 0.9rem; color: var(--tinta-suave); }
+.cartao__dados dd { margin: 0 0 0.5rem; }
+.cartao__rotulo { margin-bottom: 0.35rem; font-weight: 700; font-size: 0.9rem; color: var(--tinta-suave); }
+.etiquetas { list-style: none; margin: 0 0 1rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.etiquetas li { background: var(--placa-clara); color: var(--placa); border-radius: 999px; padding: 0.15rem 0.7rem; font-size: 0.9rem; }
+.cartao__acoes { margin-top: auto; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ---------- Guia e blocos ---------- */
+.duas-colunas { display: grid; gap: 1rem; }
+.bloco { background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio); padding: 1.25rem; margin-bottom: 1.25rem; }
+.lista-simples { margin: 0 0 1rem; padding-left: 1.25rem; }
+.lista-simples li { margin-bottom: 0.4rem; }
+.nota { color: var(--tinta-suave); font-size: 0.95rem; margin-bottom: 0; }
+
+.comprovante { margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--ok-fundo); border-left: 6px solid var(--placa-media); border-radius: var(--raio); }
+.comprovante h2 { font-size: 1.1rem; }
+.comprovante p { margin: 0; }
+
+/* ---------- Tabela do histórico ---------- */
+.tabela-rolagem { overflow-x: auto; background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio); }
+table { width: 100%; min-width: 34rem; border-collapse: collapse; }
+th, td { padding: 0.7rem 0.9rem; text-align: left; border-bottom: 1px solid var(--linha); }
+thead th { background: var(--placa-clara); color: var(--placa); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- Relatório ---------- */
+.numeros { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin: 0 0 1.5rem; }
+.numeros div { background: var(--placa-clara); border-radius: var(--raio); padding: 0.75rem; }
+.numeros dt { font-size: 0.9rem; color: var(--tinta-suave); font-weight: 600; }
+.numeros dd { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--placa); }
+.barras { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.barra { display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 0.75rem; align-items: center; }
+.barra__rotulo { grid-column: 1 / -1; font-size: 0.95rem; }
+.barra__trilho { height: 0.9rem; background: var(--placa-clara); border-radius: 999px; overflow: hidden; }
+.barra__preenchimento { display: block; height: 100%; background: var(--placa-media); border-radius: 999px; }
+.barra__valor { font-weight: 800; min-width: 2ch; text-align: right; }
+
+/* ---------- Telas maiores ---------- */
+@media (min-width: 40rem) {
+  h1 { font-size: 2.3rem; }
+  main { padding: 1.5rem 1.5rem 3.5rem; }
+  .hero { margin: 0 0 2.5rem; border-radius: var(--raio); padding: 3.5rem 2.5rem; }
+  .hero h1 { font-size: 2.9rem; }
+  .filtros { grid-template-columns: repeat(2, 1fr); }
+  .grade { grid-template-columns: repeat(2, 1fr); }
+  .duas-colunas { grid-template-columns: repeat(2, 1fr); }
+  .numeros { grid-template-columns: repeat(4, 1fr); }
+  .barra { grid-template-columns: 14rem 1fr 3rem; }
+  .barra__rotulo { grid-column: auto; }
+}
+
+@media (min-width: 56rem) {
+  .menu-botao { display: none; }
+  .menu { display: block; width: auto; }
+  .menu ul { flex-direction: row; padding: 0; align-items: center; }
+  .grade { grid-template-columns: repeat(3, 1fr); }
+  /* a trilha vira horizontal no desktop */
+  .trilha__lista { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 2.5rem 0 0; }
+  .trilha__lista::before { left: 0; right: 0; top: calc(0.8rem - 1.5px); bottom: auto; width: auto; height: 3px; }
+  .trilha__lista li { padding-bottom: 0; }
+  .trilha__lista li::before { left: 0; top: -2.5rem; }
+}
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
