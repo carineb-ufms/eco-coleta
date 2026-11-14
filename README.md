@@ -90,3 +90,69 @@ ecocoleta/
 ## Tecnologias
 
 HTML5, CSS3, JavaScript e Vue.js 3.
+
+## Ambiente de desenvolvimento integrado
+
+Este projeto agora pode ser executado em um ambiente integrado com:
+- frontend estático em HTML/CSS/JS
+- API FastAPI em Python
+- banco SQLite com os scripts da pasta `banco-de-dados`
+- Dev Container e Docker Compose para reproduzir o ambiente facilmente
+
+### Como rodar
+
+#### Opção 1: Dev Container (recomendado)
+1. Instale Docker Desktop
+2. Instale a extensão `ms-vscode-remote.remote-containers`
+3. Abra a pasta do projeto no VS Code
+4. Selecione `Reopen in Container`
+5. O app estará disponível em `http://localhost:8000`
+6. A API estará em `http://localhost:8001/docs`
+
+#### Opção 2: execução local manual
+No terminal na raiz do projeto:
+
+```bash
+python banco-de-dados/executar.py
+python -m http.server 8000
+```
+
+Em outro terminal:
+
+```bash
+cd api
+pip install -r requirements.txt
+uvicorn api.app:app --host 0.0.0.0 --port 8001 --reload
+```
+
+## Estrutura atual
+
+```text
+ecocoleta/
+├── api/
+│   ├── app.py
+│   ├── db.py
+│   ├── init_db.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── banco-de-dados/
+│   ├── 01_schema.sql
+│   ├── 02_dados.sql
+│   ├── 03_consultas.sql
+│   ├── 04_atualizacao_remocao.sql
+│   ├── executar.py
+│   └── ecocoleta.db
+├── .devcontainer/
+│   ├── devcontainer.json
+│   └── Dockerfile
+├── docker-compose.yml
+├── index.html
+├── css/
+├── js/
+├── README.md
+└── .dockerignore
+```
+
+## Observação
+
+O projeto original usa `localStorage`. A API foi adicionada como camada de integração para permitir desenvolvimento com banco real, mas ainda precisa ser conectada ao frontend para substituir completamente a persistência local.

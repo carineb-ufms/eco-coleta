@@ -1,0 +1,194 @@
+======================================================================
+1) CRIANDO AS TABELAS (01_schema.sql)
+======================================================================
+Tabelas criadas: descartes, ponto_tipo_item, pontos_coleta, tipos_item, usuarios
+
+======================================================================
+2) INSERINDO OS DADOS (02_dados.sql)
+======================================================================
+usuarios: 4 registros
+tipos_item: 7 registros
+pontos_coleta: 3 registros
+ponto_tipo_item: 9 registros
+descartes: 8 registros
+
+======================================================================
+3) CONSULTAS (03_consultas.sql)
+======================================================================
+
+>>> 1) Listar todos os pontos de coleta com os tipos aceitos (RF02)
++----+--------------------+----------------------+-----------------------+---------------------------------------------------------------------------------+
+| id | nome               | cidade               | horario               | tipos_aceitos                                                                   |
++----+--------------------+----------------------+-----------------------+---------------------------------------------------------------------------------+
+| 1  | Ponto de exemplo 1 | Cidade Exemplo       | Seg a sex, 8h às 17h  | Carregadores e cabos, Celulares e tablets, Fones de ouvido                      |
+| 2  | Ponto de exemplo 2 | Cidade Exemplo       | Seg a sáb, 9h às 18h  | Outros pequenos eletrônicos, Pen drives e cartões de memória, Pilhas e baterias |
+| 3  | Ponto de exemplo 3 | Outra Cidade Exemplo | Seg a sex, 10h às 16h | Celulares e tablets, Notebooks e acessórios, Pilhas e baterias                  |
++----+--------------------+----------------------+-----------------------+---------------------------------------------------------------------------------+
+(3 linhas)
+
+>>> 2) Filtrar pontos por cidade e por tipo de item (RF02)
++--------------------+----------------+--------------------------------------+
+| nome               | cidade         | endereco                             |
++--------------------+----------------+--------------------------------------+
+| Ponto de exemplo 2 | Cidade Exemplo | Avenida Exemplo, 200 - Bairro Modelo |
++--------------------+----------------+--------------------------------------+
+(1 linha)
+
+>>> 3) Histórico de descartes de uma estudante (RF06)
++---------------------+----------------------+------------+--------------------+---------------------------+
+| data_hora           | item                 | quantidade | ponto_nome         | observacao                |
++---------------------+----------------------+------------+--------------------+---------------------------+
+| 2026-10-02 16:20:00 | Pilhas e baterias    | 6          | Ponto de exemplo 2 | Pilhas de controle remoto |
+| 2026-09-15 11:02:00 | Carregadores e cabos | 3          | Ponto de exemplo 1 |                           |
+| 2026-09-15 11:00:00 | Celulares e tablets  | 1          | Ponto de exemplo 1 | Celular antigo sem uso    |
++---------------------+----------------------+------------+--------------------+---------------------------+
+(3 linhas)
+
+>>> 4) Relatório: total de itens por tipo, incluindo tipos sem descarte (RF07)
++---------------------------------+-----------+-------------+
+| tipo                            | registros | total_itens |
++---------------------------------+-----------+-------------+
+| Pilhas e baterias               | 2         | 10          |
+| Pen drives e cartões de memória | 1         | 5           |
+| Carregadores e cabos            | 1         | 3           |
+| Celulares e tablets             | 2         | 3           |
+| Fones de ouvido                 | 1         | 2           |
+| Notebooks e acessórios          | 1         | 1           |
+| Outros pequenos eletrônicos     | 0         | 0           |
++---------------------------------+-----------+-------------+
+(7 linhas)
+
+>>> 5) Quantidade de itens recebida por cada ponto de coleta
++--------------------+-----------------+
+| ponto              | itens_recebidos |
++--------------------+-----------------+
+| Ponto de exemplo 2 | 11              |
+| Ponto de exemplo 3 | 7               |
+| Ponto de exemplo 1 | 6               |
++--------------------+-----------------+
+(3 linhas)
+
+>>> 6) Ranking de estudantes por itens descartados
++-----------------+-----------+-------------+
+| nome            | registros | total_itens |
++-----------------+-----------+-------------+
+| Ana Estudante   | 3         | 10          |
+| Bruno Estudante | 3         | 7           |
+| Carla Estudante | 2         | 7           |
++-----------------+-----------+-------------+
+(3 linhas)
+
+>>> 7) Descartes por mês
++---------+-----------+-------+
+| mes     | registros | itens |
++---------+-----------+-------+
+| 2026-09 | 3         | 6     |
+| 2026-10 | 4         | 16    |
+| 2026-11 | 1         | 2     |
++---------+-----------+-------+
+(3 linhas)
+
+>>> 8) Usuários que ainda não registraram nenhum descarte (subconsulta)
++------------------------+-------------------+
+| nome                   | email             |
++------------------------+-------------------+
+| Administradora Exemplo | admin@exemplo.com |
++------------------------+-------------------+
+(1 linha)
+
+>>> 9) Pontos que NÃO aceitam pilhas e baterias (subconsulta)
++--------------------+----------------+
+| nome               | cidade         |
++--------------------+----------------+
+| Ponto de exemplo 1 | Cidade Exemplo |
++--------------------+----------------+
+(1 linha)
+
+======================================================================
+4) INSERT, UPDATE e DELETE (04_atualizacao_remocao.sql)
+======================================================================
+
+>>> 1) INSERT: administrador cadastra um novo ponto de coleta (RF04)
+OK (1 linha(s) afetada(s))
+
+>>> 2) INSERT: o novo ponto passa a aceitar pilhas e celulares
+OK (2 linha(s) afetada(s))
+
+>>> 3) INSERT: estudante registra um novo descarte (RF03)
+OK (1 linha(s) afetada(s))
+
+>>> 4) UPDATE: administrador altera o horário de um ponto (RF04)
+OK (1 linha(s) afetada(s))
+
+>>> 5) UPDATE: corrige a quantidade de um descarte
+OK (1 linha(s) afetada(s))
+
+>>> 6) Conferindo o ponto alterado e o novo ponto
++----+------------------------------+-----------------------+
+| id | nome                         | horario               |
++----+------------------------------+-----------------------+
+| 1  | Ponto de exemplo 1           | Seg a sex, 9h às 15h  |
+| 2  | Ponto de exemplo 2           | Seg a sáb, 9h às 18h  |
+| 3  | Ponto de exemplo 3           | Seg a sex, 10h às 16h |
+| 4  | Biblioteca Central (exemplo) | Seg a sex, 7h às 19h  |
++----+------------------------------+-----------------------+
+(4 linhas)
+
+>>> 7) DELETE: remove um tipo aceito de um ponto
+OK (1 linha(s) afetada(s))
+
+>>> 8) DELETE: exclui o ponto 3. Os descartes dele NÃO são apagados:
+OK (1 linha(s) afetada(s))
+
+>>> 9) Conferindo o histórico depois da exclusão do ponto 3
++----+----------+--------------------+------------+
+| id | ponto_id | ponto_nome         | quantidade |
++----+----------+--------------------+------------+
+| 5  |          | Ponto de exemplo 3 | 1          |
+| 6  |          | Ponto de exemplo 3 | 4          |
+| 8  |          | Ponto de exemplo 3 | 2          |
++----+----------+--------------------+------------+
+(3 linhas)
+
+>>> 10) DELETE: remove a estudante Carla e, em cascata, os descartes dela (ON DELETE CASCADE)
+OK (1 linha(s) afetada(s))
+
+>>> 11) Conferindo que os descartes dela também foram removidos
++--------------------+
+| descartes_da_carla |
++--------------------+
+| 0                  |
++--------------------+
+(1 linha)
+
+>>> 12) Totais finais por tipo (view)
++---------------------------------+-------------+
+| tipo                            | total_itens |
++---------------------------------+-------------+
+| Pilhas e baterias               | 10          |
+| Carregadores e cabos            | 7           |
+| Fones de ouvido                 | 2           |
+| Celulares e tablets             | 1           |
+| Notebooks e acessórios          | 1           |
+| Outros pequenos eletrônicos     | 0           |
+| Pen drives e cartões de memória | 0           |
++---------------------------------+-------------+
+(7 linhas)
+
+======================================================================
+TESTE DAS RESTRIÇÕES (cada comando abaixo deve ser rejeitado)
+======================================================================
+[OK] E-mail repetido (UNIQUE)
+     rejeitado: UNIQUE constraint failed: usuarios.email
+[OK] E-mail inválido (CHECK)
+     rejeitado: CHECK constraint failed: email LIKE '%_@_%._%'
+[OK] Perfil inexistente (CHECK)
+     rejeitado: CHECK constraint failed: perfil IN ('estudante', 'admin')
+[OK] Quantidade zero (CHECK)
+     rejeitado: CHECK constraint failed: quantidade BETWEEN 1 AND 99
+[OK] Usuário inexistente (chave estrangeira)
+     rejeitado: FOREIGN KEY constraint failed
+[OK] Apagar tipo de item em uso (ON DELETE RESTRICT)
+     rejeitado: FOREIGN KEY constraint failed
+
+Banco gerado em: /home/claude/ecocoleta/banco-de-dados/ecocoleta.db
