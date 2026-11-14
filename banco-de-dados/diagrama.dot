@@ -1,0 +1,63 @@
+digraph ER {
+  rankdir=LR; splines=true; nodesep=0.6; ranksep=1.1;
+  graph [fontname="Helvetica", bgcolor="white", pad=0.3];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10, color="#0d3b30", arrowhead=none];
+
+  usuarios [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#0d3b30">
+      <TR><TD BGCOLOR="#0d3b30" COLSPAN="2"><FONT COLOR="white"><B>usuarios</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">id</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">nome</TD></TR>
+      <TR><TD ALIGN="LEFT">UQ</TD><TD ALIGN="LEFT">email</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">sal</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">senha_hash</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">perfil</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">criado_em</TD></TR>
+    </TABLE>>];
+
+  descartes [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#0d3b30">
+      <TR><TD BGCOLOR="#0d3b30" COLSPAN="2"><FONT COLOR="white"><B>descartes</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">id</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">usuario_id</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">tipo_item_id</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">ponto_id</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">ponto_nome</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">quantidade</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">observacao</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">data_hora</TD></TR>
+    </TABLE>>];
+
+  tipos_item [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#0d3b30">
+      <TR><TD BGCOLOR="#0d3b30" COLSPAN="2"><FONT COLOR="white"><B>tipos_item</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">id</TD></TR>
+      <TR><TD ALIGN="LEFT">UQ</TD><TD ALIGN="LEFT">nome</TD></TR>
+    </TABLE>>];
+
+  pontos_coleta [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#0d3b30">
+      <TR><TD BGCOLOR="#0d3b30" COLSPAN="2"><FONT COLOR="white"><B>pontos_coleta</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">id</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">nome</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">cidade</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">endereco</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">horario</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">exemplo</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">criado_em</TD></TR>
+    </TABLE>>];
+
+  ponto_tipo_item [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#0d3b30">
+      <TR><TD BGCOLOR="#f0c230" COLSPAN="2"><B>ponto_tipo_item</B></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK, FK</B></TD><TD ALIGN="LEFT">ponto_id</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK, FK</B></TD><TD ALIGN="LEFT">tipo_item_id</TD></TR>
+    </TABLE>>];
+
+  usuarios        -> descartes        [headlabel="N ", taillabel=" 1", label="registra"];
+  tipos_item      -> descartes        [headlabel="N ", taillabel=" 1", label="classifica"];
+  pontos_coleta   -> descartes        [headlabel="N ", taillabel=" 1", label="recebe"];
+  pontos_coleta   -> ponto_tipo_item  [headlabel="N ", taillabel=" 1", label="aceita"];
+  tipos_item      -> ponto_tipo_item  [headlabel="N ", taillabel=" 1", label="é aceito"];
+}
